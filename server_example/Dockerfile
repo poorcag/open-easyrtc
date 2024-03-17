@@ -1,5 +1,5 @@
 # Pull base image.
-FROM node:14-alpine
+FROM node:18-alpine
 MAINTAINER Harold Thetiot <hthetiot@gmail.com>
 
 # Upgrade npm
