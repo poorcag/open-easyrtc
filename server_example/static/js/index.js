@@ -1,31 +1,10 @@
-//
-//Copyright (c) 2016, Skedans Systems, Inc.
-//All rights reserved.
-//
-//Redistribution and use in source and binary forms, with or without
-//modification, are permitted provided that the following conditions are met:
-//
-//    * Redistributions of source code must retain the above copyright notice,
-//      this list of conditions and the following disclaimer.
-//    * Redistributions in binary form must reproduce the above copyright
-//      notice, this list of conditions and the following disclaimer in the
-//      documentation and/or other materials provided with the distribution.
-//
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-//AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-//IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-//ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-//LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-//CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-//SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-//INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-//CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-//ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-//POSSIBILITY OF SUCH DAMAGE.
-//
+
 var selfEasyrtcid = "";
 var connectList = {};
 var channelIsActive = {}; // tracks which channels are active
+
+var accelerometerData = { x: 0, y: 0, z: 0 };
+var gyroscopeData = { alpha: 0, beta: 0, gamma: 0 };
 
 
 function connect() {
@@ -51,6 +30,46 @@ function addToConversation(who, msgType, content) {
             "<b>" + who + ":</b>&nbsp;" + content + "<br />";
 }
 
+// Check if accelerometer and gyroscope are available
+if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
+    // Add event listeners for accelerometer and gyroscope data
+    window.addEventListener('devicemotion', function(event) {
+        accelerometerData.x = event.acceleration.x;
+        accelerometerData.y = event.acceleration.y;
+        accelerometerData.z = event.acceleration.z;
+
+        sendSensorData();
+    });
+
+    window.addEventListener('deviceorientation', function(event) {
+        gyroscopeData.alpha = event.alpha;
+        gyroscopeData.beta = event.beta;
+        gyroscopeData.gamma = event.gamma;
+
+        sendSensorData();
+    });
+}
+
+
+function sendSensorData(otherEasyrtcid) {
+    // Send accelerometer and gyroscope data via data message
+    var data = {
+        accelerometer: accelerometerData,
+        gyroscope: gyroscopeData
+    };
+
+    // Convert data to JSON string
+    var jsonData = JSON.stringify(data);
+
+    // Iterate through all connected peers and send data via data channel
+    for (var otherEasyrtcid in connectList) {
+        // Check if connected to otherEasyrtcid
+        if (easyrtc.getConnectStatus(otherEasyrtcid) === easyrtc.IS_CONNECTED) {
+            // Send data via data channel
+            easyrtc.sendDataP2P(otherEasyrtcid, 'sensorData', jsonData);
+        }
+    }
+}
 
 function openListener(otherParty) {
     channelIsActive[otherParty] = true;
