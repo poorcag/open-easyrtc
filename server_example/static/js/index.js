@@ -3,6 +3,9 @@ var selfEasyrtcid = "";
 var connectList = {};
 var channelIsActive = {}; // tracks which channels are active
 
+var sentAccelerometer = { x: 0, y: 0, z: 0 };
+var sentGyroscope = { alpha: 0, beta: 0, gamma: 0 };
+
 var accelerometerData = { x: 0, y: 0, z: 0 };
 var gyroscopeData = { alpha: 0, beta: 0, gamma: 0 };
 
@@ -24,27 +27,32 @@ function connect() {
 
 function addToConversation(who, msgType, content) {
     // Escape html special characters, then add linefeeds.
-    content = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    content = content.replace(/\n/g, '<br />');
-    document.getElementById('conversation').innerHTML +=
-            "<b>" + who + ":</b>&nbsp;" + content + "<br />";
+    // content = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // content = content.replace(/\n/g, '<br />');
+    // document.getElementById('conversation').innerHTML +=
+    //         "<b>" + who + ":</b>&nbsp;" + content + "<br />";
+    var receivedData = JSON.parse(content);
+
+// Extract accelerometer and gyroscope data from the received object
+    accelerometerData = receivedData.accelerometer;
+    gyroscopeData = receivedData.gyroscope;
 }
 
 // Check if accelerometer and gyroscope are available
 if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
     // Add event listeners for accelerometer and gyroscope data
     window.addEventListener('devicemotion', function(event) {
-        accelerometerData.x = event.acceleration.x;
-        accelerometerData.y = event.acceleration.y;
-        accelerometerData.z = event.acceleration.z;
+        sentAccelerometer.x = event.acceleration.x;
+        sentAccelerometer.y = event.acceleration.y;
+        sentAccelerometer.z = event.acceleration.z;
 
         sendSensorData();
     });
 
     window.addEventListener('deviceorientation', function(event) {
-        gyroscopeData.alpha = event.alpha;
-        gyroscopeData.beta = event.beta;
-        gyroscopeData.gamma = event.gamma;
+        sentGyroscope.alpha = event.alpha;
+        sentGyroscope.beta = event.beta;
+        sentGyroscope.gamma = event.gamma;
 
         sendSensorData();
     });
@@ -54,8 +62,8 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
 function sendSensorData(otherEasyrtcid) {
     // Send accelerometer and gyroscope data via data message
     var data = {
-        accelerometer: accelerometerData,
-        gyroscope: gyroscopeData
+        accelerometer: sentAccelerometer,
+        gyroscope: sentGyroscope
     };
 
     // Convert data to JSON string
@@ -169,13 +177,14 @@ function sendStuffP2P(otherEasyrtcid) {
         return;
     }
     if (easyrtc.getConnectStatus(otherEasyrtcid) === easyrtc.IS_CONNECTED) {
-        easyrtc.sendDataP2P(otherEasyrtcid, 'msg', text);
+        console.log("Successfully connected to ", otherEasyrtcid);
+        console.log(text);
     }
     else {
         easyrtc.showError("NOT-CONNECTED", "not connected to " + easyrtc.idToName(otherEasyrtcid) + " yet.");
     }
 
-    addToConversation("Me", "msgtype", text);
+    // addToConversation("Me", "msgtype", text);
     document.getElementById('sendMessageText').value = "";
 }
 
