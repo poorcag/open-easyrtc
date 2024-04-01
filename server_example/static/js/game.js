@@ -66,16 +66,10 @@ const createScene = function () {
 
         position = position.add(velocity.scale(timeStep));
 
-        let rotationChange = BABYLON.Quaternion.RotationYawPitchRoll(
-            gyroscopeData.beta * timeStep,
-            gyroscopeData.alpha * timeStep,
-            gyroscopeData.gamma * timeStep
-        );
-
-        // orientation = orientation.multiply(rotationChange);
-
-        // box.rotationQuaternion = orientation;
-        box.position.copyFrom(position);
+        // box.position.copyFrom(position);
+        box.rotation.x = gyroscopeData.beta * Math.PI / 180;
+        box.rotation.y = gyroscopeData.gamma * Math.PI / 180;
+        box.rotation.z = gyroscopeData.alpha * Math.PI / 180;
 
         if (box.position.x > 100)
         {

@@ -68,3 +68,8 @@ Run HTTPS server with custom certs:
 
 
 
+Andrew's notes:
+
+> docker build . -t australia-southeast2-docker.pkg.dev/gyro-417412/quickstart-docker-repo/easyrtc-server
+
+> docker push australia-southeast2-docker.pkg.dev/gyro-417412/quickstart-docker-repo/easyrtc-server:latest 
