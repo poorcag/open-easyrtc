@@ -32,9 +32,6 @@ const createScene = function () {
     const gravity = -9.81;
 
     scene.onBeforeRenderObservable.add(() => {
-        var accelerometerData = { x: 0, y: 0, z: 0 };
-        var gyroscopeData = { alpha: 0, beta: 0, gamma: 0 };
-
         acceleration.x = accelerometerData.x;
         acceleration.y = accelerometerData.y;
         acceleration.z = accelerometerData.z;
