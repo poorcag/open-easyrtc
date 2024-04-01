@@ -36,6 +36,14 @@ function addToConversation(who, msgType, content) {
 // Extract accelerometer and gyroscope data from the received object
     accelerometerData = receivedData.accelerometer;
     gyroscopeData = receivedData.gyroscope;
+
+    document.getElementById('conversation').innerHTML = "" +
+        receivedData.accelerometer.x + "<br />" +
+        receivedData.accelerometer.y + "<br />" +
+        receivedData.accelerometer.z + "<br />" +
+        receivedData.gyroscope.alpha + "<br />" +
+        receivedData.gyroscope.beta + "<br />" +
+        receivedData.gyroscope.gamma + "<br />"
 }
 
 // Check if accelerometer and gyroscope are available

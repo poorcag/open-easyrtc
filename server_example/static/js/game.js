@@ -31,16 +31,38 @@ const createScene = function () {
     let orientation = new BABYLON.Quaternion.RotationYawPitchRoll(0, 0, 0);
     const gravity = -9.81;
 
+    // simple line
+    const points1 =
+    [
+        0, 0, 0,
+        0, 1, 0
+    ]
+    const colors = []
+
+    const line1 = BABYLON.CreateGreasedLine("line1", 
+    {
+        points: points1,
+        updatable: true 
+    },
+    {
+        color: BABYLON.Color3.Red(),
+        useColors: true,
+        colors,
+    })
+
     scene.onBeforeRenderObservable.add(() => {
         acceleration.x = accelerometerData.x;
         acceleration.y = accelerometerData.y;
         acceleration.z = accelerometerData.z;
 
-        const timeStep = scene.deltaTime
+        const timeStep = scene.deltaTime * 0.02
 
         velocity = velocity.add(acceleration.scale(timeStep));
         // velocity.y -= gravity * timeStep
         velocity.y = 0;
+
+        velocity.x = Math.max(Math.min(velocity.x, 1), -1)
+        velocity.y = Math.max(Math.min(velocity.y, 1), -1)
 
         position = position.add(velocity.scale(timeStep));
 
@@ -50,11 +72,36 @@ const createScene = function () {
             gyroscopeData.gamma * timeStep
         );
 
-        orientation = orientation.multiply(rotationChange);
+        // orientation = orientation.multiply(rotationChange);
 
-        box.rotationQuaternion = orientation;
+        // box.rotationQuaternion = orientation;
         box.position.copyFrom(position);
+
+        if (box.position.x > 100)
+        {
+            box.position.x = -90
+        }
+        if (box.position.x < -100)
+        {
+            box.position.x = 90
+        }
+        if (box.position.z > 100)
+        {
+            box.position.z = -90
+        }
+        if (box.position.z < -100)
+        {
+            box.position.z = 90
+        }
     })
+    
+    var positions = line1.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+    positions[3] = accelerometerData.x;
+    positions[4] = accelerometerData.y;
+    positions[5] = accelerometerData.z;
+    line1.updateVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
+
+    scene.debugLayer.show();
 
     return scene;
 };
