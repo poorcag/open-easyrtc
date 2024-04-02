@@ -66,10 +66,14 @@ const createScene = function () {
 
         position = position.add(velocity.scale(timeStep));
 
+        var rotationQuaternion = getQuaternion(gyroscopeData.alpha, gyroscopeData.beta, gyroscopeData.gamma);
+        box.rotationQuaternion = new BABYLON.Quaternion(
+            x = rotationQuaternion[1],
+            y = rotationQuaternion[2],
+            z = rotationQuaternion[3],
+            w = rotationQuaternion[0]
+        )
         // box.position.copyFrom(position);
-        box.rotation.x = gyroscopeData.beta * Math.PI / 180;
-        box.rotation.y = gyroscopeData.gamma * Math.PI / 180;
-        box.rotation.z = gyroscopeData.alpha * Math.PI / 180;
 
         if (box.position.x > 100)
         {
