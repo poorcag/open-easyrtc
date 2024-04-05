@@ -25,7 +25,6 @@ var webServer = http.createServer(app);
 var socketServer = socketIo.listen(webServer, {"log level":1});
 
 // Cross-domain workaround presented below:
-/*
 socketServer.origins(function(origin, callback) {
     if (origin && ![
         'http://localhost:8080',
@@ -35,7 +34,6 @@ socketServer.origins(function(origin, callback) {
     }
     callback(null, true);
 });
-*/
 
 easyrtc.setOption("logLevel", "debug");
 
